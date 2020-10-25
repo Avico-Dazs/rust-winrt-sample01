@@ -1,20 +1,14 @@
-winrt::import!(
-    dependencies
-        os
-    types
-        windows::data::xml::dom::*
-);
-
 fn main() -> winrt::Result<()> {
-    use windows::data::xml::dom::*;
+    use bindings::windows::system::diagnostics::*;
  
-    let doc = XmlDocument::new()?;
-    doc.load_xml("<html>hello world</html>")?;
+    for process in ProcessDiagnosticInfo::get_for_processes()? {
+        println!(
+            "id: {:5} packaged: {:5} name: {}",
+            process.process_id()?,
+            process.is_packaged()?,
+            process.executable_file_name()?
+        );
+    }
  
-    let root = doc.document_element()?;
-    assert!(root.node_name()? == "html");
-    assert!(root.inner_text()? == "hello world");
- 
-
     Ok(())
 }
